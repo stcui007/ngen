@@ -146,10 +146,18 @@ There are some special config parameters which are not *always* required in BMI 
   * Required for C-based BMI model formulations
 
 ### Optional Parameters
+<<<<<<< HEAD
 * `other_input_variables`
   * this may be provided to set certain model variables more directly after its `initialize` function
   * JSON structure should be one or more nested JSON nodes, keyed by the variable name, and with the variable values contained as a list
   * e.g.,  `"other_input_variables": {"ex_var_1": [0, 1, 2]}`
+>>>>>>> Commiting Documentation
+=======
+* `variables_names_map`
+  * can specify a mapping of model variable names (input or output) to supported standard names
+  * supported standard names are listed in the [include/utilities/Constants.h](../include/utilities/Constants.h) file
+  * this can be useful in particular for informing the framework how to provide the input a model needs for execution
+  * e.g.,  `"variables_names_map": {"model_variable_name": "standard_variable_name"}`
 >>>>>>> Commiting Documentation
 * `output_variables`
   * can specify the particular set and order of output variables to include in the realization's `get_output_line_for_timestep()` (and similar) function
