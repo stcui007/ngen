@@ -1,6 +1,9 @@
 # Definitions
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Commiting Documentation
 Basic Model Interface (BMI) - A library specification created by the Community Surface Dynamics Modeling System (CSDMS) to facilitate the conversion of a model or dataset into a reusable, plug-and-play component. [See BMI](https://bmi.readthedocs.io/en/latest/)
 
 Catchment - Generally, a physiographic unit where hydrologic processes take place. This class denotes a physiographic unit, which is defined by a hydrologically determined outlet to which all waters flow. While a catchment exists, it may or may not be clearly identified for repeated study. Specifically for this framework, a catchment represents an arbitrary spatial area and is an abstraction used to encapsulate a model. Every catchment has a catchment area realization. Every catchment of degree 2 will have a flowpath realization. [See HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#_catchment)
@@ -48,6 +51,7 @@ Software Development Kit (SDK) - A collection of software development tools in o
 
 Waterbody - Mass of water distinct from other masses of water. Waterbodies either reside over (rivers and floodplains) or break apart the catchment area coverage (large lakes). [see HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#_waterbody_also_water_body)
 
+<<<<<<< HEAD
 
 # References
 
@@ -61,4 +65,13 @@ Waterbody - Mass of water distinct from other masses of water. Waterbodies eithe
 # References
 
 1.
+>>>>>>> Commiting Documentation
+=======
+
+# References
+
+1. https://bmi.readthedocs.io/en/latest/
+2. https://docs.opengeospatial.org/is/14-111r6/14-111r6.html
+3. http://infolab.stanford.edu/~burback/watersluice/node147.html
+4. https://www.mdpi.com/2073-4441/11/4/772
 >>>>>>> Commiting Documentation
