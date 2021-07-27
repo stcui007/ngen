@@ -12,6 +12,7 @@
   * [Example: CFE Shared Library](#bmi-c-cfe-example)
   * [BMI C Caveats](#bmi-c-caveats)
 * [Multi-Module BMI Formulations](#multi-module-bmi-formulations)
+<<<<<<< HEAD
 =======
     * [Required Parameters](#required-parameters)
     * [Semi-Optional Parameters](#semi-optional-parameters)
@@ -29,6 +30,8 @@
   * [BMI C Model As Shared Library](#bmi-c-shared-library)
   * [Example: CFE Shared Library](#bmi-c-cfe-example)
   * [BMI C Caveats](#bmi-c-caveats)
+>>>>>>> Commiting Documentation
+=======
 >>>>>>> Commiting Documentation
 
 ## Summary
@@ -107,7 +110,21 @@ Because of the generalization of the interface to the model, the required and op
 >>>>>>> Commiting Documentation
 
 ### Required Parameters
+<<<<<<< HEAD
 The following must be present in the formulation/realization JSON config for all catchment entries using the BMI formulation type:
+>>>>>>> Commiting Documentation
+=======
+Certain parameters are strictly required in the formulation/realization JSON config for a catchment entry using a BMI formulation type.  Note that there is a slight distinction in "required" between single-module (e.g., `bmi_c`) and multi-module formulations (i.e., `bmi_multi`).  These are summarized in the following table, with the details of the parameters list below.
+
+| Param | Single-Module | Multi-Module |
+| ----- | ------------- | ------------ |
+| `model_type_name` | :heavy_check_mark: | :heavy_check_mark: |
+| `init_config` | :heavy_check_mark: | |
+| `uses_forcing_file` | :heavy_check_mark: | |
+| `main_output_variable` | :heavy_check_mark: | :heavy_check_mark: |
+| `modules` | | :heavy_check_mark: |
+
+##### Parameter Details:
 >>>>>>> Commiting Documentation
 
 * `model_type_name`
@@ -167,13 +184,16 @@ There are some special BMI formulation config parameters which are required in c
   * the string value of the primary output variable
   * this is the value that returned by the realization's `get_response()`
   * the string must match an item return by the relevant variant of the BMI `get_output_var_names()` function
+* `modules`
+  * a list of individual formulation configs for component modules of a BMI multi-module formulation
+  * each item in the list will be another nested JSON config object for a BMI formulation
 
 ### Semi-Optional Parameters
-There are some special config parameters which are not *always* required in BMI formulation configs, but are in some circumstances.  Thus, they do not strictly behave exactly as *Required* params do in the configuration, but they should be thought of as required (and will trigger errors when missing) in certain situations.
+There are some special BMI formulation config parameters which are required in certain circumstances, but which are neither *always* required nor required for either all single- or multi-module formulations.  Thus, they do not behave exactly as *Required* params do in the configuration.  However, they should be thought of as de facto required (and will trigger errors when missing) in the specific situations in which they are applicable.
 
 * `forcing_file`
   * string path to the forcing data file for the catchment
-  * required whenever a model needs to read its own forcings directly
+  * must be set whenever a model needs to read its own forcings directly
     * this is set/indicated using `uses_forcing_file` as described above
   * the BMI model's initialization config (i.e., `init_config` above) may define an analogous property, and the two should properly correspond in such cases
 * `library_file`
@@ -392,4 +412,32 @@ This is easy enough to remedy via a bootstrapping function that assigns function
 >>>>>>> Commiting Documentation
 =======
 Future versions of NextGen will provide alternative ways to declaratively configure function names from a BMI C library so they can individually be dynamically loaded.
+<<<<<<< HEAD
+>>>>>>> Commiting Documentation
+=======
+
+
+## Multi-Module BMI Formulations
+It is possible to configure a formulation to be a combination of several different individual BMI module components.  This is the `bmi_multi` formulation type.
+
+As described in [Required Parameters](#required-parameters), a BMI `init_config` does not need to be specified for this formulation type, but a nested list of sub-formulation configs (in `modules`) does.  Execution of a formulation time step update proceeds through each module in list order.
+
+A few other items of note:
+
+* there are some constraints on input and output variables of the sub-modules of a multi-module formulation
+  * output variables must be uniquely traceable
+    * there must not be any output variable from a sub-module for which there is another output variable in a different sub-module that has the same config-mapped alias
+    * when nothing is set for a variable in ``variables_names_map``, its alias is equal to its name
+    * when this doesn't hold, a unique mapped alias must be configured for one of the two (i.e., either an alias added, or changed to something different)
+  * input variables must have previously-identified data providers
+    * every input variable must have its alias match a property from an output data source 
+    * one way this works is if the alias is equal to the name of an externally available forcing property (e.g., AORC read from file) defined before the sub-module 
+    * another way is if the input variable's alias matches the alias of an output variable from an earlier sub-module
+      * in this case, one sub-module's output serve as a later sub-modules input for each multi-module formulation update
+      * since modules get executed in order of configuration, "earlier" and "later" are with respect to the order they are defined in the ``modules`` config list
+* the framework allows independent configuration of the `uses_forcing_file` property among the individual sub-formulations, although this is not generally recommended
+* configuration of `variables_names_map` maps a given variable to a variable name of the directly 
+
+
+
 >>>>>>> Commiting Documentation
