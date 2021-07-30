@@ -11,10 +11,14 @@ Currently there are two directory layers beneath the top-level *extern/* directo
 ## Working with the Submodule
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Some simple explanations of several command actions are included below.  To better understand what these things are doing, consult the [Git Submodule documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules). 
 =======
 Some simple explanations of several commands are included below.  To better understand what these things are doing, consult the [Git Submodule documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules). 
 >>>>>>> Commiting Documentation
+=======
+Some simple explanations of several command actions are included below.  To better understand what these things are doing, consult the [Git Submodule documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules). 
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 ### Getting the Latest Changes
 
@@ -25,10 +29,14 @@ There are two steps to getting upstream submodule changes fully
 To fetch and check out the latest revision (for the [currently used branch](#viewing-the-current-branch)):
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     git submodule update --init --remote -- extern/alt-modular/alt-modular
 =======
     git submodule update --remote extern/alt-modular/alt-modular
 >>>>>>> Commiting Documentation
+=======
+    git submodule update --init --remote -- extern/alt-modular/alt-modular
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 To commit the current submodule checkout revision to the NGen repo:
 
@@ -36,6 +44,9 @@ To commit the current submodule checkout revision to the NGen repo:
     git commit
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 ### Viewing the Commit Hash
 
 Git submodule configurations include the specific commit to be checked out (or an implicit default).  The current commit can be view with `git submodule status`:
@@ -51,6 +62,7 @@ The latest commit in the configured branch can be brought in as described here. 
     git config -f .gitmodules "submodule.extern/alt-modular/alt-modular.branch" <branchName>
 
 Note that this will be done in the NGen repo configuration, so it can then be committed and push to remotes.  It is also possible to do something similar in just the local clone of a repo, by configuring `.git/config` instead of `.gitmodules`.  See the Git documentation for more on how that works if needed.
+<<<<<<< HEAD
 =======
 ### Viewing the Current Branch
 
@@ -68,6 +80,8 @@ To change the branch for everyone, run the following:
 
     git config -f .gitmodules "submodule.extern/alt-modular/alt-modular.branch" main
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 # Usage
 

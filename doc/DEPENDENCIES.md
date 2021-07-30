@@ -164,7 +164,11 @@ If the above `update` command does not check out the expected version, this can 
 The version used is automatically handled by submodule config.  This can be synced by re-running the initialization command above.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 As of project version `0.1.0`, the required version is tag `v2.6.0`.
 =======
 As of project version `0.1.0`, the required version is tag `v2.6.0`.
 >>>>>>> Commiting Documentation
+=======
+As of project version `0.1.0`, the required version is tag `v2.6.0`.
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba

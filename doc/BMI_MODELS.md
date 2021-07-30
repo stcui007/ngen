@@ -4,6 +4,9 @@
 * [Formulation Config](#formulation-config)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
   * [Required Parameters](#required-parameters)
   * [Semi-Optional Parameters](#semi-optional-parameters)
   * [Optional Parameters](#optional-parameters)
@@ -12,6 +15,7 @@
   * [Example: CFE Shared Library](#bmi-c-cfe-example)
   * [BMI C Caveats](#bmi-c-caveats)
 * [Multi-Module BMI Formulations](#multi-module-bmi-formulations)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
     * [Required Parameters](#required-parameters)
@@ -33,19 +37,25 @@
 >>>>>>> Commiting Documentation
 =======
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 ## Summary
 
 The basic outline of steps needed to work with an external BMI model is:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 * Configure the main formulation/realization config properly for the catchments that will use the generalized BMI realization(s)
 * Make sure all the necessary model-specific BMI initialization files are valid and in place
 * Take appropriate steps to make model source files accessible as needed (e.g., making sure shared library files are in a known location)
 * Be aware of any model-language-specific caveats
   * [Caveats for C language models](#bmi-c-caveats)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
   * Configure the main formulation/realization config properly for the catchments that will use the generalized BMI realization(s) 
@@ -56,6 +66,8 @@ The basic outline of steps needed to work with an external BMI model is:
 >>>>>>> Commiting Documentation
 =======
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 [//]: # (TODO: what does the realization config need to look like?)
 
@@ -76,6 +88,7 @@ The catchment entry in the formulation/realization config must be set to used th
       ...
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
   
@@ -83,10 +96,14 @@ The catchment entry in the formulation/realization config must be set to used th
 =======
 
 >>>>>>> Commiting Documentation
+=======
+
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 Valid name values for the currently implemented BMI formulation types are:
 
 * `bmi_c`
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 Because of the generalization of the interface to the model, the required and optional parameters for all the BMI formulation types are the same.
@@ -114,6 +131,11 @@ Because of the generalization of the interface to the model, the required and op
 The following must be present in the formulation/realization JSON config for all catchment entries using the BMI formulation type:
 >>>>>>> Commiting Documentation
 =======
+=======
+Because of the generalization of the interface to the model, the required and optional parameters for all the BMI formulation types are the same.
+
+### Required Parameters
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 Certain parameters are strictly required in the formulation/realization JSON config for a catchment entry using a BMI formulation type.  Note that there is a slight distinction in "required" between single-module (e.g., `bmi_c`) and multi-module formulations (i.e., `bmi_multi`).  These are summarized in the following table, with the details of the parameters list below.
 
 | Param | Single-Module | Multi-Module |
@@ -125,13 +147,19 @@ Certain parameters are strictly required in the formulation/realization JSON con
 | `modules` | | :heavy_check_mark: |
 
 ##### Parameter Details:
+<<<<<<< HEAD
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 * `model_type_name`
   * string name for the particular backing model type
   * may not be utilized in all cases, but still required
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 * `init_config`
   * the string path to the BMI initialization config file for the catchment
 * `uses_forcing_file`
@@ -166,6 +194,7 @@ There are some special BMI formulation config parameters which are required in c
   * supported standard names are listed in the [Bmi_Formulation.hpp](..include/realizations/catchment/Bmi_Formulation.hpp) file
   * this can be useful in particular for informing the framework how to provide the input a model needs for execution
   * e.g.,  `"variables_names_map": {"model_variable_name": "standard_variable_name"}`
+<<<<<<< HEAD
 =======
 * `forcing_file`
   * string path to the forcing data file for the catchment
@@ -218,6 +247,8 @@ There are some special BMI formulation config parameters which are required in c
   * this can be useful in particular for informing the framework how to provide the input a model needs for execution
   * e.g.,  `"variables_names_map": {"model_variable_name": "standard_variable_name"}`
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 * `output_variables`
   * can specify the particular set and order of output variables to include in the realization's `get_output_line_for_timestep()` (and similar) function
   * JSON structure should be a list of strings
@@ -244,11 +275,17 @@ There are some special BMI formulation config parameters which are required in c
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 For **C** models, the model must be packaged as a pre-compiled shared library.  A CMake cache variables can be configured for controlling whether the framework functionality for working with BMI C libraries is activated.  This is found in, or must be added to, the _CMakeCache.txt_ file in the build system directory:
 
 * `BMI_C_LIB_ACTIVE`
   * type: `BOOL`
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
   * must be set to `ON` (or equivalent in CMake) for BMI C shared library functionality to be compiled and active
 
 The CMake build system may need to be [regenerated](BUILDS_AND_CMAKE.md#regenerating) after changing these settings.
@@ -260,6 +297,7 @@ When CMake is able to find the library for the given name, it will automatically
 #### Dynamic Loading
 
 Additionally, as noted [above](#semi-optional-parameters), the path to the shared library must be provided in the configuration. This is because C libraries must be loaded dynamically within the execution of the NextGen framework, or else certain limitations of C would prevent using more than one such external C BMI model library at a time.
+<<<<<<< HEAD
 =======
 For **C** models, the model must be packaged as a pre-compiled shared library.  Several CMake cache variables must be configured for controlling whether to expect such a library and how to find it.  These are found in, or must be added to, the _CMakeCache.txt_ file in the build system directory:
 =======
@@ -286,6 +324,8 @@ See [caveat](#only-one-generic-bmi-c-at-a-time) about only using one **C** BMI m
 =======
 Additionally, as noted [above](#semi-optional-parameters), the path to the shared library must be provided in the configuration. This is because C libraries must be loaded dynamically within the execution of the NextGen framework, or else certain limitations of C would prevent using more than one such external C BMI model library at a time.
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 ### BMI C CFE Example
 
@@ -296,15 +336,19 @@ An example implementation for an appropriate BMI model as a **C** shared library
 * [Activation/Deactivation in CMake Required](#bmi-c-activatedeactivation-required-in-cmake-build)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 * [Only One Generic BMI C at a Time](#only-one-generic-bmi-c-at-a-time)
 >>>>>>> Commiting Documentation
 =======
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 * [Additional Bootstrapping Function Needed](#additional-bootstrapping-function-needed)
 
 #### BMI C Activate/Deactivation Required in CMake Build
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -375,6 +419,9 @@ BMI C functionality will not work (i.e., will not be compiled or executable) unl
 =======
 BMI C functionality will not work (i.e., will not be compiled or executable) unless set to be active in the CMake build.  This requires setting the `BMI_C_LIB_ACTIVE` CMake cache variable to `ON` or `TRUE` (or equivalent).
 >>>>>>> Commiting Documentation
+=======
+BMI C functionality will not work (i.e., will not be compiled or executable) unless set to be active in the CMake build.  This requires setting the `BMI_C_LIB_ACTIVE` CMake cache variable to `ON` or `TRUE` (or equivalent).
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 Conversely, built executables (and perhaps certain build targets) may not function as expected if `BMI_C_LIB_ACTIVE` is `ON` but the configured shared library is not available.
 
@@ -408,6 +455,7 @@ Full examples for how to write this registration function can be found in the lo
 This is needed both due to the design of the **C** language variant of BMI, and the limitations of C regarding duplication of function names.  The latter becomes significant when more than one BMI C library is used at once.  Even if that is actively the case, NextGen is designed to accomodate that case, so this requirement is in place.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 This is easy enough to remedy via a bootstrapping function that assigns function implementations to the pointer for a particular `Bmi` struct instance.  This function is not strictly part of the BMI spec, though, but it is necessary to have a BMI **C** model work using the generic NextGen realization.
 >>>>>>> Commiting Documentation
 =======
@@ -415,6 +463,9 @@ Future versions of NextGen will provide alternative ways to declaratively config
 <<<<<<< HEAD
 >>>>>>> Commiting Documentation
 =======
+=======
+Future versions of NextGen will provide alternative ways to declaratively configure function names from a BMI C library so they can individually be dynamically loaded.
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 
 ## Multi-Module BMI Formulations
@@ -440,4 +491,7 @@ A few other items of note:
 
 
 
+<<<<<<< HEAD
 >>>>>>> Commiting Documentation
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba

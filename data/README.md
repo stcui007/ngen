@@ -13,10 +13,14 @@ NGEN intends to support systems of model instances that represent hydrology acro
 A. A model domain may implement a continuous or gridded discretization that can exchange information with the reference domain through hydrologic locations and spatial couplings but does not use a catchment-based discretization within the framework. A mapping configuration for hydrologic locations and spatial couplings is required in this case.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 B. A model domain may implement a catchment-based discretization that does not perfectly coincide with the reference domain catchments. Framework catchment functionality could be used with model-domain-specific catchment identifiers and hydrologic location and spatial couplings could also be used.
 =======
 B. A model domain may implement a catchment-based discretization that does not perfectly coincide with the reference domain catchments. Framework catchment functionality could be used with model-domain-specific catchment identifiers and hydrologic location and spatal couplings could also be used.
 >>>>>>> Commiting Documentation
+=======
+B. A model domain may implement a catchment-based discretization that does not perfectly coincide with the reference domain catchments. Framework catchment functionality could be used with model-domain-specific catchment identifiers and hydrologic location and spatial couplings could also be used.
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 C. A model domain may implement a catchment-based discretization that coincides with the reference domain catchments. In this case, no mappings are required for hydrologic locations or spatial couplings. Note that such a discretization may be courser than the reference domain catchment network such that all catchments are catchment aggregates made up of reference domain catchments.
 
@@ -27,6 +31,9 @@ D. A model domain may implement a catchment-based discretization that is at a fi
 ![Example Image](https://github.com/NOAA-OWP/ngen/blob/master/data/demo.png)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 [See hygeo for more about the data model.](https://dblodgett-usgs.github.io/hygeo/dev/)
 
 ## Model Domain Parameters
@@ -38,6 +45,7 @@ Case 2: Lumped model discretized at a finer resolution than reference domain or 
 For a model domain that encompasses multiple reference domain catchments, mappings from model i/o hydrologic locations to reference domain i/o hydrologic locations are provided in a separate file. Other model domain to reference domain mappings may be required.
 
 ### Core Schema
+<<<<<<< HEAD
 
 <details><summary>Example Instance</summary>
 <p>
@@ -84,6 +92,49 @@ At the top level we have a hydrologic graph of catchments and nexuses and a hydr
 
 Both catchments and nexuses are represented as labeled nodes with unlabeled directed edges between. 
 >>>>>>> Commiting Documentation
+=======
+
+<details><summary>Example Instance</summary>
+<p>
+  
+```json
+{
+  "model-domain-id": {
+    "inflow-hydroNexus": "reference-nexus-id",
+    "outflow-hydroNexus": "reference-nexus-id",
+    "defaults": {
+      "formulation": "formulation-id",
+      "parameters": {
+        "formulation-1": {
+          "param1": 123,
+          "param2": 123
+        },
+        "formulation-2": {
+          "param1": 123,
+          "param2": 123
+        }
+      },
+      "forcings": "default-forcings"
+    },
+    "catchments": {
+      "catchment-id": {
+        "formulation-1": {
+          "param1": 123,
+          "param2": 123
+        }, 
+        "forcings": "custom-forcings"
+      },
+      "catchment-id": {
+        "formulation-2": {
+          "param1": 123,
+          "param2": 123
+        }
+      }
+    }
+  }
+}
+```
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 </p>
 </details>
@@ -99,10 +150,14 @@ Both catchments and nexuses are represented as labeled nodes with unlabeled dire
 ### reference domain: A continental-scale hydrofabric
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 - A common hydrography catchment / nexus network for i/o locations and forcing / coupling interface standardization.
 =======
 Every catchment has a catchment area realization. The catchment area would be implemented as a local water budget model which takes inputs from the atmosphere and non-surficial hydro geologic systems and contributes outputs to an outlet nexus. There is a potential to have a catchment contribute flow incrementally along the waterbody(ies) that flow through it but this would be an advanced case.
 >>>>>>> Commiting Documentation
+=======
+- A common hydrography catchment / nexus network for i/o locations and forcing / coupling interface standardization.
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 ### catchment: see [HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#_catchment)
 
@@ -110,6 +165,7 @@ Every catchment has a catchment area realization. The catchment area would be im
 
 - In this context, an aggregate of reference domain catchments
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 ### inflow nexus: [see HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#figure25)
 =======
@@ -208,5 +264,14 @@ For a model domain that encompasses multiple reference domain catchments, mappin
 ### catchment network: [see HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#_catchment_network_topology)
 
 ### hydrologic location: [see HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#_hydro_logic_location)
+=======
+### inflow nexus: [see HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#figure25)
+
+### outflow nexus: [see HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#figure25)
+
+### catchment network: [see HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#_catchment_network_topology)
+
+### hydrologic location: [see HY\_Features](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html#_hydro_logic_location)
+>>>>>>> 5b9a5d5f782d2be54ada22a61dd314208d044dba
 
 
