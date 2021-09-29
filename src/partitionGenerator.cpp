@@ -14,7 +14,7 @@
 #include "core/Partition_Parser.hpp"
 
 using PartitionVSet = std::vector<std::unordered_set<std::string> >;
-using RemoteConnectionVec = std::vector<std::tuple<int, std::string, std::string> >;
+using RemoteConnectionVec = std::vector<std::tuple<int, std::string, std::string, std::string> >;
 
 /**
  * @brief Write the partition details to the @p outFile
@@ -74,10 +74,12 @@ void write_remote_connections(PartitionVSet catchment_part, PartitionVSet nexus_
             int part_id = std::get<0>(remote_conn);
             std::string nexus_id = std::get<1>(remote_conn);
             std::string catchment_id = std::get<2>(remote_conn);
+            const std::string catchment_direction = std::get<3>(remote_conn);
             {
                 outFile << "{" << "\"mpi-rank\":" << part_id << ", ";
                 outFile << "\"nex-id\":" << "\""<< nexus_id <<"\"" << ", ";
-                outFile << "\"cat-id\":" << "\""<< catchment_id << "\"" << "}";
+                outFile << "\"cat-id\":" << "\""<< catchment_id << "\"" << ", ";
+                outFile << "\"cat-direction\":" << "\""<< catchment_direction << "\"" << "}";
                 if (set_counter == (vec_size-1))
                 {
                     outFile << "";
@@ -259,7 +261,7 @@ void generate_partitions(network::Network& network, const int& num_partitions, c
  * 
  * @throws invalid_argument if the partition_number is not in the range of valid partition numbers (size of catchment_partitions)
  */
-int find_partition_connections(std::string nexus, PartitionVSet catchment_partitions, int partition_number,  std::vector<std::string>& ids_to_find, RemoteConnectionVec& remote_connections )
+int find_partition_connections(std::string nexus, PartitionVSet catchment_partitions, int partition_number,  std::vector<std::string>& ids_to_find, const std::string catchment_direction, RemoteConnectionVec& remote_connections )
 {
     if( partition_number < 0 || partition_number >= catchment_partitions.size() ){
         throw std::invalid_argument("find_partition_connections: partition_number not valid for catchment_partitions of size "+
@@ -294,7 +296,7 @@ int find_partition_connections(std::string nexus, PartitionVSet catchment_partit
                     if ( pos >= 0 )
                     {
                         //std::cout << "Found id: " << id << " in partition: " << pos << "\n";
-                        remote_connections.push_back(std::make_tuple(pos, nexus, id));
+                        remote_connections.push_back(std::make_tuple(pos, nexus, id, catchment_direction));
                         ++remote_catchments;
                     }
                     else
@@ -438,17 +440,19 @@ int main(int argc, char* argv[])
 
         int remote_catchments = 0;
         
+        const std::string origination_cat_to_nex = "orig_cat-to-nex";
+        const std::string nex_to_destination_cat = "nex-to-dest_cat";
         for ( const auto& n : local_nexuses )
         {
             //std::cout << "Searching for catchements connected to " << n << "\n"; 
             //Find upstream connections
             auto orgin_ids = global_network.get_origination_ids(n);
             //std::cout << "Found " << orgin_ids.size() << " upstream catchments for nexus with id: " << n << "\n";
-            remote_catchments += find_partition_connections(n, catchment_part, ipart, orgin_ids, remote_connections );
+            remote_catchments += find_partition_connections(n, catchment_part, ipart, orgin_ids, origination_cat_to_nex, remote_connections );
             //Find downstream connections
             auto dest_ids = global_network.get_destination_ids(n);
             //std::cout << "Found " << dest_ids.size() << " downstream catchments for nexus with id: " << n << "\n";
-            remote_catchments += find_partition_connections(n, catchment_part, ipart, dest_ids, remote_connections );    
+            remote_catchments += find_partition_connections(n, catchment_part, ipart, dest_ids, nex_to_destination_cat, remote_connections );    
         }
 
         remote_connections_vec.push_back(remote_connections);

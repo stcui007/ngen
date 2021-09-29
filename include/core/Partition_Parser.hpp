@@ -27,7 +27,7 @@ struct PartitionData
     int mpi_world_rank;
     std::unordered_set<std::string> catchment_ids;
     std::unordered_set<std::string> nexus_ids;
-    std::vector<std::tuple<int, std::string, std::string> > remote_connections;
+    std::vector<std::tuple<int, std::string, std::string, std::string> > remote_connections;
 };
 
 
@@ -56,8 +56,9 @@ class Partitions_Parser {
             int remote_mpi_rank;
             std::string remote_nex_id;
             std::string remote_cat_id;
-            std::tuple<int, std::string, std::string> tmp_tuple;
-            std::vector<std::tuple<int, std::string, std::string> > remote_conn_vec;
+            std::string remote_cat_dir;
+            std::tuple<int, std::string, std::string, std::string> tmp_tuple;
+            std::vector<std::tuple<int, std::string, std::string, std::string> > remote_conn_vec;
             int part_counter = 0;
             for(auto &partition: tree.get_child("partitions"))  {
                 //Get partition id
@@ -93,7 +94,8 @@ class Partitions_Parser {
                     remote_mpi_rank = remote_conn.at("mpi-rank").as_natural_number();
                     remote_nex_id = remote_conn.at("nex-id").as_string();
                     remote_cat_id = remote_conn.at("cat-id").as_string();
-                    tmp_tuple = std::make_tuple(remote_mpi_rank, remote_nex_id, remote_cat_id);
+                    remote_cat_dir = remote_conn.at("cat-direction").as_string();
+                    tmp_tuple = std::make_tuple(remote_mpi_rank, remote_nex_id, remote_cat_id, remote_cat_dir);
                     remote_conn_vec.push_back(tmp_tuple);
                 }
                 part_data.remote_connections = remote_conn_vec;
@@ -132,14 +134,16 @@ class Partitions_Parser {
 
             for (auto i = part_data.remote_connections.cbegin(); i != part_data.remote_connections.cend(); ++i)
             {
-                std::tuple<int, std::string, std::string> remote_conn = *i;
+                std::tuple<int, std::string, std::string, std::string> remote_conn = *i;
                 int mpi_rank = std::get<0>(remote_conn);
                 std::string nex_id = std::get<1>(remote_conn);
                 std::string cat_id = std::get<2>(remote_conn);
+                std::string cat_dir = std::get<3>(remote_conn);
 
                 std::cout << "\nget_partition_struct, remote_mpi_ranks: " << mpi_rank; 
                 std::cout << "\nget_partition_struct, remote_nexus: " << nex_id;
                 std::cout << "\nget_partition_struct, remote_catchment: " << cat_id;
+                std::cout << "\nget_partition_struct, remote_catchment: " << cat_dir;
             }
             std::cout << "\n--------------------" << std::endl;
             */
@@ -166,8 +170,8 @@ class Partitions_Parser {
         int mpi_world_rank;
         std::unordered_set<std::string> catchment_ids;
         std::unordered_set<std::string> nexus_ids;
-        std::vector<std::tuple<int, std::string, std::string> > remote_connections;
-        std::tuple<int, std::string, std::string> remote_tuple;
+        std::vector<std::tuple<int, std::string, std::string, std::string> > remote_connections;
+        std::tuple<int, std::string, std::string, std::string> remote_tuple;
 
         boost::property_tree::ptree tree;
 };

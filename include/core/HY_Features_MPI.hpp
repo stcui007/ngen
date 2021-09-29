@@ -29,8 +29,17 @@ namespace hy_features {
             return network.filter("cat");
         }
 
+        inline bool is_remote_receiver_nexus(std::string id) {
+            //return _nexuses.find(id) != _nexuses.end() && _nexuses[id]->is_remote_receiver();
+            return remote_receiver.find(id) != remote_receiver.end() && remote_sender.find(id) == remote_sender.end();
+        }
+
         inline bool is_remote_sender_nexus(std::string id) {
-            return _nexuses.find(id) != _nexuses.end() && _nexuses[id]->is_remote_sender();
+            return remote_sender.find(id) != remote_sender.end();
+        }
+
+        inline bool is_local_nexus(std::string id) {
+            return remote_receiver.find(id) == remote_receiver.end() && remote_sender.find(id) == remote_sender.end();
         }
 
         inline std::vector<std::shared_ptr<HY_HydroNexus>> destination_nexuses(std::string id) {
@@ -75,6 +84,8 @@ namespace hy_features {
       
       std::unordered_map<std::string, std::shared_ptr<HY_Catchment>> _catchments;
       std::unordered_map<std::string, std::shared_ptr<HY_PointHydroNexusRemote>> _nexuses;
+      std::unordered_set<std::string> remote_sender;
+      std::unordered_set<std::string> remote_receiver;
       network::Network network;
       std::shared_ptr<Formulation_Manager> formulations;
       int mpi_rank;

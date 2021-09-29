@@ -71,7 +71,8 @@ void PartitionsParserTest::setupArbitraryExampleCase() {
 
 TEST_F(PartitionsParserTest, TestFileReader)
 {
-  const std::string file_path = file_search(data_paths,"partition_huc01.json");
+  //const std::string file_path = file_search(data_paths,"partition_huc01.json");
+  const std::string file_path = file_search(data_paths,"sugar_creek_partitions_8.json");
   Partitions_Parser partitions_parser = Partitions_Parser(file_path);
 
   partitions_parser.parse_partition_file();
@@ -82,14 +83,14 @@ TEST_F(PartitionsParserTest, TestFileReader)
 
 TEST_F(PartitionsParserTest, DisplayPartitionData)
 {
-  const std::string file_path = file_search(data_paths,"partition_huc01.json");
+  const std::string file_path = file_search(data_paths,"sugar_creek_partitions_8.json");
   Partitions_Parser partitions_parser = Partitions_Parser(file_path);
 
   partitions_parser.parse_partition_file();
 
   //In real application, num_partitions may be an input parameter
-  //For unit test, num_partitions value should be consistent with that of partition_huc01.json
-  int num_partitions = 100;
+  //For unit test, num_partitions value should be consistent with that of sugar_creek_partitions_8.json
+  int num_partitions = 8;
 
   int i;
   int part_id;

@@ -48,15 +48,19 @@ class HY_PointHydroNexusRemote : public HY_PointHydroNexus
                 
                 for ( const auto& id : receiving_list )
                 {
-                    try
-                    {
-                        //auto& remote_rank = loc_map.at(id);
-                        auto& remote_rank = catchment_id_to_mpi_rank.at(id);
-                    }
-                    catch (std::exception &e)
-                    {
-                        continue;
-                    }
+                    //auto& remote_rank = loc_map.at(id);
+                    //auto& remote_rank = catchment_id_to_mpi_rank.at(id);
+                    const auto& iter_remote_rank = catchment_id_to_mpi_rank.find(id);
+                    if (iter_remote_rank == catchment_id_to_mpi_rank.end())
+                      continue;
+                    if (iter_remote_rank->second != get_world_rank())
+                      return true;
+                    else
+                      throw std::runtime_error("catchment_to_mpi_rank contains current rank");
+                    //catch (std::exception &e)
+                    //{
+                    //    continue;
+                    //}
                 }
                 
                 return false;
