@@ -211,7 +211,15 @@ int main(int argc, char *argv[]) {
       //if (!features.is_remote_sender_nexus(id)) {
       std::cout << "mpi_rank: " << mpi_rank << ", nexus_id: " << id  << ", is remote receiver: "  << features.is_remote_receiver_nexus(id)
                 << ", is remote sender: " << features.is_remote_sender_nexus(id) <<  ", is remote local: " << features.is_local_nexus(id) << std::endl;
-      if (features.is_remote_receiver_nexus(id) || features.is_local_nexus(id)) {
+      if (features.is_remote_receiver_nexus(id) )
+        std::cout << "mpi_rank: " << mpi_rank << ", remote receiver nexus_id: " << id << std::endl;
+      if (features.is_remote_sender_nexus(id) )
+        std::cout << "mpi_rank: " << mpi_rank << ", remote sender nexus_id: " << id << std::endl;
+      if (features.is_local_nexus(id) )
+        std::cout << "mpi_rank: " << mpi_rank << ", local nexus_id: " << id << std::endl;
+
+      if ( features.is_remote_sender_nexus(id) || features.is_local_nexus(id)) {
+      //if ( (features.is_remote_receiver_nexus(id) && !features.is_remote_sender_nexus(id) ) || features.is_local_nexus(id)) {
         nexus_outfiles[id].open("./"+id+"_output.csv", std::ios::trunc);
         std::cout << "features nexus_id: " << id << std::endl;
         nex_counter++;
@@ -220,7 +228,7 @@ int main(int argc, char *argv[]) {
       nexus_outfiles[id].open("./"+id+"_output.csv", std::ios::trunc);
   #endif
     }
-    std::cout << "nexus_counter: " << nexus_counter << ", nex_counter: " << nex_counter << std::endl;
+    std::cout << "mpi_rank: " << mpi_rank << ", nexus_counter: " << nexus_counter << std::endl;
 
     std::cout<<"Running Models"<<std::endl;
 
@@ -263,9 +271,9 @@ int main(int argc, char *argv[]) {
           std::cout << output_time_index << " nexus_id: " << id << std::endl;
         }
   #ifdef NGEN_MPI_ACTIVE
-        if ((mpi_rank == 6) && (id == "nex-22") )
-          MPI_Abort(MPI_COMM_WORLD, 999);
-        if (features.is_remote_receiver_nexus(id) || features.is_local_nexus(id)) { //Ensures only one side of the dual sided remote nexus actually doing this...
+        if ( features.is_remote_sender_nexus(id) || features.is_local_nexus(id)) {
+        //if ( (features.is_remote_receiver_nexus(id) && !features.is_remote_sender_nexus(id) ) || features.is_local_nexus(id)) {
+        //if (features.is_remote_receiver_nexus(id) || features.is_local_nexus(id)) { //Ensures only one side of the dual sided remote nexus actually doing this...
   #endif
           //Get the correct "requesting" id for downstream_flow
 	  const auto& nexus = features.nexus_at(id);
