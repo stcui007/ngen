@@ -129,7 +129,9 @@ void HY_PointHydroNexusRemote::add_upstream_flow(double val, std::string catchme
        stored_recieves.resize(stored_recieves.size() + 1);
        stored_recieves.back().buffer = std::make_shared<time_step_and_flow_t>();
 
-       int tag = extract(catchment_id);
+       //int tag = extract(catchment_id);
+       int tag = extract(id);
+
 
        //Receive downstream_flow from Upstream Remote Nexus to this Downstream Remote Nexus
        status = MPI_Irecv(
