@@ -205,10 +205,6 @@ int main(int argc, char *argv[]) {
       nexus_counter++;
       std::cout << "for loop nexus_id: " << id << std::endl;
   #ifdef NGEN_MPI_ACTIVE
-      //if (local_data.nexus_at(id).is_remote_sender() == false )
-      //if (!features.is_remote_sender_nexus(id)) {
-      //if (features.is_remote_receiver_nexus(id)) {
-      //if (!features.is_remote_sender_nexus(id)) {
       std::cout << "mpi_rank: " << mpi_rank << ", nexus_id: " << id  << ", is remote receiver: "  << features.is_remote_receiver_nexus(id)
                 << ", is remote sender: " << features.is_remote_sender_nexus(id) <<  ", is remote local: " << features.is_local_nexus(id) << std::endl;
       if (features.is_remote_receiver_nexus(id) )
@@ -218,11 +214,14 @@ int main(int argc, char *argv[]) {
       if (features.is_local_nexus(id) )
         std::cout << "mpi_rank: " << mpi_rank << ", local nexus_id: " << id << std::endl;
 
-      if ( features.is_remote_sender_nexus(id) || features.is_local_nexus(id)) {
-      //if ( (features.is_remote_receiver_nexus(id) && !features.is_remote_sender_nexus(id) ) || features.is_local_nexus(id)) {
-        nexus_outfiles[id].open("./"+id+"_output.csv", std::ios::trunc);
-        std::cout << "features nexus_id: " << id << std::endl;
-        nex_counter++;
+      if ( features.is_remote_receiver_nexus(id) || features.is_local_nexus(id) ) {
+        {
+          std::string m_rank = std::to_string(mpi_rank);
+          nexus_outfiles[id].open("./"+id+"_output.csv", std::ios::trunc);
+          //nexus_outfiles[id].open("./"+id+"_mpi-rank_"+m_rank+"_output.csv", std::ios::trunc);
+          std::cout << "features nexus_id: " << id << std::endl;
+          nex_counter++;
+        }
       }
   #else 
       nexus_outfiles[id].open("./"+id+"_output.csv", std::ios::trunc);
@@ -237,6 +236,7 @@ int main(int argc, char *argv[]) {
     //Now loop some time, iterate catchments, do stuff for total number of output times
     int output_time_last = manager->Simulation_Time_Object->get_total_output_times();
     output_time_last--;
+
     for(int output_time_index = 0; output_time_index < manager->Simulation_Time_Object->get_total_output_times(); output_time_index++) {
       //std::cout<<"Output Time Index: "<<output_time_index<<std::endl;
       if(output_time_index%100 == 0) std::cout<<"Running timestep "<<output_time_index<<std::endl;
@@ -271,9 +271,8 @@ int main(int argc, char *argv[]) {
           std::cout << output_time_index << " nexus_id: " << id << std::endl;
         }
   #ifdef NGEN_MPI_ACTIVE
-        if ( features.is_remote_sender_nexus(id) || features.is_local_nexus(id)) {
-        //if ( (features.is_remote_receiver_nexus(id) && !features.is_remote_sender_nexus(id) ) || features.is_local_nexus(id)) {
-        //if (features.is_remote_receiver_nexus(id) || features.is_local_nexus(id)) { //Ensures only one side of the dual sided remote nexus actually doing this...
+        if ( features.is_remote_receiver_nexus(id) || features.is_local_nexus(id) ) {
+        {
   #endif
           //Get the correct "requesting" id for downstream_flow
 	  const auto& nexus = features.nexus_at(id);
@@ -288,37 +287,44 @@ int main(int argc, char *argv[]) {
             cat_id = "terminal";
           }
 
-          //double contribution_at_t;
-          //if (output_time_index == 0) contribution_at_t = 0.0;
-          //contribution_at_t += 1.0;
           /*
           double contribution_at_t = features.nexus_at(id)->get_downstream_flow(cat_id, output_time_index, 100.0);
           if(nexus_outfiles[id].is_open()) {
             nexus_outfiles[id] << output_time_index << ", " << current_timestamp << ", " << contribution_at_t << std::endl;
             nexus_outfiles[id].flush();
-            //nexus_outfiles[id] << output_time_index << ", " << current_timestamp << ", " << 100.0 << std::endl;
           }
           */
+       
+          double contribution_at_t = 0.0;
+          try{
+              contribution_at_t = features.nexus_at(id)->get_downstream_flow(cat_id, output_time_index, 100.0);
+          }
+          catch(exception e)
+          {
+              contribution_at_t = -42.0;
+          }
+          if(nexus_outfiles[id].is_open()) {
+            nexus_outfiles[id] << output_time_index << ", " << current_timestamp << ", " << contribution_at_t << std::endl;
+            nexus_outfiles[id].flush();
+          }
 
   #ifdef NGEN_MPI_ACTIVE
           /*
           double contribution_at_t = 0.0;
-          if (cat_id != "terminal")
-          {
-            contribution_at_t = 1000.0;
+          try{
+              contribution_at_t = features.nexus_at(id)->get_downstream_flow(cat_id, output_time_index, 100.0);
           }
-          */
-          double contribution_at_t = features.nexus_at(id)->get_downstream_flow(cat_id, output_time_index, 100.0);
+          catch(exception e)
+          {
+              contribution_at_t = -42.0;
+          }
+          //double contribution_at_t = features.nexus_at(id)->get_downstream_flow(cat_id, output_time_index, 100.0);
           if(nexus_outfiles[id].is_open()) {
             nexus_outfiles[id] << output_time_index << ", " << current_timestamp << ", " << contribution_at_t << std::endl;
             nexus_outfiles[id].flush();
-            if ((mpi_rank == 6) && (id == "nex-22") && (nexus_outfiles["nex-22"]) )
-            {
-              std::cout << "output to nex-22 successful" << std::endl;
-            }
-            //nexus_outfiles[id] << output_time_index << ", " << current_timestamp << ", " << 100.0 << std::endl;
           }
-          //MPI_Barrier(MPI_COMM_WORLD);
+          */
+        }
         }
   #endif
         //std::cout<<"\tNexus "<<id<<" has "<<contribution_at_t<<" m^3/s"<<std::endl;

@@ -15,7 +15,6 @@ HY_Features_MPI::HY_Features_MPI( PartitionData partition_data, geojson::GeoJSON
       std::vector<std::string> origins, destinations;
       
       std::unordered_map<std::string, HY_PointHydroNexusRemote::catcment_location_map_t> remote_connections;
-      //std::unordered_map<std::string, std::unordered_map<std::string, HY_PointHydroNexusRemote::catcment_location_map_t> > remote_connections;
 
       // loop through the partiton data remote arrays and make a map of catchment location maps
       for( int i = 0; i < partition_data.remote_connections.size(); ++i )
@@ -26,25 +25,17 @@ HY_Features_MPI::HY_Features_MPI( PartitionData partition_data, geojson::GeoJSON
         std::string remote_catchments = std::get<2>(remote_tuple);
         std::string remote_cat_dir = std::get<3>(remote_tuple);
         remote_connections[remote_nexi][remote_catchments] = remote_mpi_ranks;
-        if (remote_cat_dir == "nex-to-dest_cat")
+        //if (remote_cat_dir == "nex-to-dest_cat")
+        if (remote_cat_dir == "orig_cat-to-nex")
         {
           remote_sender.insert(remote_nexi);
         }
-        else if (remote_cat_dir == "orig_cat-to-nex")
+        //else if (remote_cat_dir == "orig_cat-to-nex")
+        else if (remote_cat_dir == "nex-to-dest_cat")
         {
           remote_receiver.insert(remote_nexi);
         }
-        //remote_connections[remote_nexi][remote_cat_dir][remote_catchments] = remote_mpi_ranks;
-        std::cout << "remote_mpi_ranks: " << remote_mpi_ranks << std::endl;
-        for ( auto it = remote_sender.begin(); it != remote_sender.end(); ++it )
-          std::cout << "remote_sender: " << *it << std::endl;
-        for ( auto it = remote_receiver.begin(); it != remote_sender.end(); ++it )
-          std::cout << "remote_receiver: " << *it << std::endl;
-        //remote_connections[remote_nexi][remote_catchments][remote_cat_dir] = remote_mpi_ranks;
-
-        //remote_connections[partition_data.remote_nexi[i]][partition_data.remote_catchments[i]] = partition_data.remote_mpi_ranks[i];
       }
-
 
       for(const auto& feat_idx : network){
         feat_id = network.get_id(feat_idx);//feature->get_id();

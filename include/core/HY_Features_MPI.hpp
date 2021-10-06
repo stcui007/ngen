@@ -29,14 +29,16 @@ namespace hy_features {
             return network.filter("cat");
         }
 
-        inline bool is_remote_receiver_nexus(std::string id) {
-            //return _nexuses.find(id) != _nexuses.end() && _nexuses[id]->is_remote_receiver();
-            //return remote_receiver.find(id) != remote_receiver.end() && remote_sender.find(id) == remote_sender.end();
-            return remote_receiver.find(id) != remote_receiver.end();
+        //inline bool is_remote_receiver_nexus(std::string id) {
+        //    return remote_receiver.find(id) != remote_receiver.end() && remote_sender.find(id) == remote_sender.end();
+        inline bool is_remote_sender_nexus(std::string id) {
+            return remote_sender.find(id) != remote_sender.end() && remote_receiver.find(id) == remote_receiver.end();
         }
 
-        inline bool is_remote_sender_nexus(std::string id) {
-            return remote_sender.find(id) != remote_sender.end();
+        //inline bool is_remote_sender_nexus(std::string id) {
+        //    return remote_sender.find(id) != remote_sender.end();
+        inline bool is_remote_receiver_nexus(std::string id) {
+            return remote_receiver.find(id) != remote_receiver.end();
         }
 
         inline bool is_local_nexus(std::string id) {
