@@ -215,6 +215,15 @@ int main(int argc, char *argv[]) {
         std::cout << "mpi_rank: " << mpi_rank << ", local nexus_id: " << id << std::endl;
 
       if ( features.is_remote_receiver_nexus(id) || features.is_local_nexus(id) ) {
+      //if (!features.is_local_nexus("nex-22") || !features.is_local_nexus("nex-23") || !features.is_local_nexus("nex-87") )
+        if (id == "nex-22" || id == "nex-23" || id == "nex-87")
+        {
+            if (features.is_local_nexus(id) )
+            //if (features.is_remote_receiver_nexus(id) )
+            {
+                continue;
+            }
+        }
         {
           std::string m_rank = std::to_string(mpi_rank);
           nexus_outfiles[id].open("./"+id+"_output.csv", std::ios::trunc);
@@ -223,11 +232,11 @@ int main(int argc, char *argv[]) {
           nex_counter++;
         }
       }
+      std::cout << "mpi_rank: " << mpi_rank << ", nexus_counter: " << nexus_counter << std::endl;
   #else 
       nexus_outfiles[id].open("./"+id+"_output.csv", std::ios::trunc);
   #endif
     }
-    std::cout << "mpi_rank: " << mpi_rank << ", nexus_counter: " << nexus_counter << std::endl;
 
     std::cout<<"Running Models"<<std::endl;
 
@@ -272,7 +281,14 @@ int main(int argc, char *argv[]) {
         }
   #ifdef NGEN_MPI_ACTIVE
         if ( features.is_remote_receiver_nexus(id) || features.is_local_nexus(id) ) {
+        if (id == "nex-22" || id == "nex-23" || id == "nex-87")
         {
+            if (features.is_local_nexus(id) )
+            //if (features.is_remote_receiver_nexus(id) )
+            {
+                continue;
+            }
+        }
   #endif
           //Get the correct "requesting" id for downstream_flow
 	  const auto& nexus = features.nexus_at(id);
@@ -324,7 +340,6 @@ int main(int argc, char *argv[]) {
             nexus_outfiles[id].flush();
           }
           */
-        }
         }
   #endif
         //std::cout<<"\tNexus "<<id<<" has "<<contribution_at_t<<" m^3/s"<<std::endl;
