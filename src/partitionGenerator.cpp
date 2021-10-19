@@ -10,11 +10,15 @@
 #include <vector>
 #include <unordered_set>
 #include <tuple>
+#include <boost/functional/hash.hpp>
 
 #include "core/Partition_Parser.hpp"
 
 using PartitionVSet = std::vector<std::unordered_set<std::string> >;
 using RemoteConnectionVec = std::vector<std::tuple<int, std::string, std::string, std::string> >;
+
+typedef std::pair<std::string, std::string> Pair;
+std::unordered_set<Pair, boost::hash<Pair>> remote_conn_duplicate;
 
 /**
  * @brief Write the partition details to the @p outFile
@@ -132,6 +136,7 @@ void generate_partitions(network::Network& network, const int& num_partitions, c
     std::cout << "remainder:" << remainder << std::endl;
     **/
     std::unordered_set<std::string> catchment_set, nexus_set;
+    std::unordered_set<std::string> total_nexus_set;
     std::string part_id, partition_str;
     std::vector<std::string> part_ids;
 
@@ -140,6 +145,8 @@ void generate_partitions(network::Network& network, const int& num_partitions, c
 
     std::string up_nexus;
     std::string down_nexus;
+    int num_upstream = 0;
+    int num_downstream = 0;
     for(const auto& catchment : network.filter("cat", network::SortOrder::TransposedDepthFirstPreorder)){
             if (partition < remainder)
                 partition_size = partition_size_plus1;
@@ -151,10 +158,14 @@ void generate_partitions(network::Network& network, const int& num_partitions, c
             //list of all required nexus the partition needs to worry about
             for( auto downstream : network.get_destination_ids(catchment) ){
                 nexus_set.emplace(downstream);
+                total_nexus_set.emplace(downstream);
+                num_downstream++;
                 //nexus_list.push_back(downstream);
             }
             for( auto upstream : network.get_origination_ids(catchment) ){
                 nexus_set.emplace(upstream);
+                total_nexus_set.emplace(upstream);
+                num_upstream++;
                 //nexus_list.push_back(upstream);
             }
             //std::cout<<catchment<<" -> "<<nexus<<std::endl;
@@ -218,6 +229,8 @@ void generate_partitions(network::Network& network, const int& num_partitions, c
                 //std::cout<<"\nin partition "<<partition<<":"<<std::endl;
             }
     }
+    std::cout << "num_upstream nexuses: " << num_upstream << ", num_downstream nexuses: " << num_downstream << std::endl;
+    std::cout << "total_nexus_set size: " << total_nexus_set.size() << std::endl;
 
     // validating catchment partition
     std::cout << "Validating catchments..." << std::endl;
@@ -268,6 +281,7 @@ int find_partition_connections(std::string nexus, PartitionVSet catchment_partit
                                      std::to_string( catchment_partitions.size()) + ".");
     }
     std::unordered_set<std::string> catchments = catchment_partitions[partition_number];
+    Pair remote_pair;
     int remote_catchments = 0;
     for( auto id : ids_to_find )
             {
@@ -295,9 +309,18 @@ int find_partition_connections(std::string nexus, PartitionVSet catchment_partit
                     
                     if ( pos >= 0 )
                     {
-                        //std::cout << "Found id: " << id << " in partition: " << pos << "\n";
-                        remote_connections.push_back(std::make_tuple(pos, nexus, id, catchment_direction));
-                        ++remote_catchments;
+                        remote_pair = std::make_pair(nexus,id);
+                        if (remote_conn_duplicate.find(remote_pair) != remote_conn_duplicate.end() )
+                        {
+                            std::cout << "mpi_rank: " << pos << ", nexus_id: " << nexus << ", cat_id: " << id << ", cat_dir: " << catchment_direction << std::endl;
+                        }
+                        if (remote_conn_duplicate.find(remote_pair) == remote_conn_duplicate.end() )
+                        {
+                            //std::cout << "Found id: " << id << " in partition: " << pos << "\n";
+                            remote_connections.push_back(std::make_tuple(pos, nexus, id, catchment_direction));
+                            ++remote_catchments;
+                            remote_conn_duplicate.emplace(remote_pair);
+                        }
                     }
                     else
                     {
@@ -419,6 +442,7 @@ int main(int argc, char* argv[])
     {
         // declare and initialize remote_connections
         RemoteConnectionVec remote_connections;
+        RemoteConnectionVec local_connections;
 
         //std::vector<std::string> local_cat_ids = catchment_part[ipart]["cat-ids"];
         std::unordered_set<std::string> local_cat_set = catchment_part[ipart];
@@ -438,13 +462,62 @@ int main(int argc, char* argv[])
         // to have any practical effect on remote nexus determination, but it's still a mismatch.
         
         // test each nexus in the local network to make sure its upstream and downstream exist in the local network
+        // build local-connections in a similar manner as remote-connections
+        // check each element is unique
+        /*
+        for ( const auto& loc_cat : local_cat_set)
+        {
+            std::cout << "mpi_rank: " << ipart << ", local cat from local_cat_set: " << loc_cat << std::endl;
+        }
+        */
+
         auto local_cats = local_network.filter("cat");
+        int num_local_cat = 0;
+        for ( const auto& loc_cat : local_cats)
+        {
+            num_local_cat++;
+            std::cout << "mpi_rank: " << ipart << ", local cat from local_cats: " << loc_cat << std::endl;
+        }
         auto local_nexuses = local_network.filter("nex");
+
+        int num_local_connections = 0;
+        const std::string origination_cat_to_nex = "orig_cat-to-nex";
+        const std::string nex_to_destination_cat = "nex-to-dest_cat";
+        for ( const auto& loc_nex : local_nexuses)
+        {
+            std::cout << "mpi_rank: " << ipart << ", local nexus: " << loc_nex << std::endl;
+            auto loc_origin_ids = local_network.get_origination_ids(loc_nex);
+            auto loc_dest_ids = local_network.get_destination_ids(loc_nex);
+
+            for ( const auto& loc_id : loc_origin_ids)
+            {
+                // using locat_cat_set with each element unique
+                //if (local_cat_set.find(loc_id) != local_cat_set.end() )
+                {
+                    std::cout << "mpi_rank: " << ipart << ", local nexus: " << loc_nex << ", local origin id: " << loc_id << std::endl;
+                    local_connections.push_back(std::make_tuple(ipart, loc_nex, loc_id, "orig_cat-to-nex") );
+                    ++num_local_connections;
+                }
+            }
+            for ( const auto& loc_id : loc_dest_ids)
+            {
+                // using locat_cat_set with each element unique
+                //if (local_cat_set.find(loc_id) != local_cat_set.end() )
+                {
+                    std::cout << "mpi_rank: " << ipart << ", local nexus: " << loc_nex << ", local destination id: " << loc_id << std::endl;
+                    local_connections.push_back(std::make_tuple(ipart, loc_nex, loc_id, "nex-to-dest_cat") );
+                    ++num_local_connections;
+                }
+            }
+        }
+        std::cout << "\nFound " << num_local_connections <<  " local connections in partition "<<ipart<<"\n";
+        //std::cout << "Found " << local_cat_set.size() << " local catchments in partition "<<ipart<<"\n";
+        std::cout << "Found " << num_local_cat << " local catchments in partition "<<ipart<<"\n";
 
 
         int remote_catchments = 0;
-        const std::string origination_cat_to_nex = "orig_cat-to-nex";
-        const std::string nex_to_destination_cat = "nex-to-dest_cat";
+        //const std::string origination_cat_to_nex = "orig_cat-to-nex";
+        //const std::string nex_to_destination_cat = "nex-to-dest_cat";
 
         for ( const auto& n : local_nexuses )
         {
@@ -466,7 +539,7 @@ int main(int argc, char* argv[])
         std::cout << "Found " << remote_catchments << " remotes in partition "<<ipart<<"\n";
         total_remotes += remote_catchments;
     }
-    std::cout << "Found " << total_remotes << " total remotes (average of approximately " << (total_remotes/num_partitions) << " remotes per partition)";
+    std::cout << "Found " << total_remotes << " total remotes (average of approximately " << (total_remotes/num_partitions) << " remotes per partition)" << std::endl;
 
     write_remote_connections(catchment_part, nexus_part, remote_connections_vec, num_partitions, outFile);
 
