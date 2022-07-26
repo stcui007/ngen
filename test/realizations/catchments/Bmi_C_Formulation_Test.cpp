@@ -23,7 +23,8 @@
 #include <boost/property_tree/json_parser.hpp>
 #include "FileChecker.h"
 #include "Formulation_Manager.hpp"
-#include "Forcing.h"
+//#include "Forcing.h"
+#include "CsvPerFeatureForcingProvider.hpp"
 #include <boost/date_time.hpp>
 
 using ::testing::MatchesRegex;
