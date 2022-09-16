@@ -172,10 +172,10 @@ class [[deprecated("Legacy Forcing object will be removed soon.")]] Forcing : pu
      *
      * @return The inclusive beginning of the period of time over which this instance can provide this data.
      */
-    [[deprecated]]
-    time_t get_forcing_output_time_begin(const std::string &output_name) {
-        return start_date_time_epoch;
-    }
+    //[[deprecated]]
+    //time_t get_forcing_output_time_begin(const std::string &output_name) {
+    //    return start_date_time_epoch;
+    //}
 
     /**
      * Get the inclusive beginning of the period of time over which this instance can provide data for this forcing.
@@ -192,10 +192,10 @@ class [[deprecated("Legacy Forcing object will be removed soon.")]] Forcing : pu
      *
      * @return The exclusive ending of the period of time over which this instance can provide this data.
      */
-    [[deprecated]]
-    time_t get_forcing_output_time_end(const std::string &output_name) {
-        return end_date_time_epoch;
-    }
+    //[[deprecated]]
+    //time_t get_forcing_output_time_end(const std::string &output_name) {
+    //    return end_date_time_epoch;
+    //}
 
     /**
      * Get the exclusive ending of the period of time over which this instance can provide data for this forcing.

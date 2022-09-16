@@ -65,10 +65,10 @@ namespace data_access {
          *
          * @return The inclusive beginning of the period of time over which this instance can provide this data.
          */
-        [[deprecated]]
-        time_t get_forcing_output_time_begin(const std::string &output_name) {
-            return wrapped_provider->get_data_start_time();
-        }
+        //[[deprecated]]
+        //time_t get_forcing_output_time_begin(const std::string &output_name) {
+        //    return wrapped_provider->get_data_start_time();
+        //}
 
         /**
          * Get the inclusive beginning of the period of time over which this instance can provide data for this forcing.
@@ -84,10 +84,10 @@ namespace data_access {
          *
          * @return The exclusive ending of the period of time over which this instance can provide this data.
          */
-        [[deprecated]]
-        time_t get_forcing_output_time_end(const std::string &output_name) {
-            return wrapped_provider->get_data_stop_time();
-        }
+        //[[deprecated]]
+        //time_t get_forcing_output_time_end(const std::string &output_name) {
+        //    return wrapped_provider->get_data_stop_time();
+        //}
 
         /**
          * Get the exclusive ending of the period of time over which this instance can provide data for this forcing.

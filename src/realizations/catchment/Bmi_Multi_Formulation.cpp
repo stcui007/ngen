@@ -177,6 +177,7 @@ const bool &Bmi_Multi_Formulation::get_allow_model_exceed_end_time() const {
  * @see ForcingProvider
  */
 const vector<std::string> &Bmi_Multi_Formulation::get_available_forcing_outputs() {
+//const vector<std::string> &Bmi_Multi_Formulation::get_avaliable_variable_names() {
     if (is_model_initialized() && available_forcings.empty()) {
         for (const nested_module_ptr &module: modules) {
             for (const std::string &out_var_name: module->get_bmi_output_variables()) {

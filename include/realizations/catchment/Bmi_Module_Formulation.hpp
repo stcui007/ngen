@@ -244,6 +244,7 @@ namespace realization {
          * @see ForcingProvider
          */
         const vector<std::string> &get_available_forcing_outputs() {
+        //const vector<std::string> &get_avaliable_variable_names() override {
             if (is_model_initialized() && available_forcings.empty()) {
                 for (const std::string &output_var_name : get_bmi_model()->GetOutputVarNames()) {
                     available_forcings.push_back(output_var_name);
@@ -269,9 +270,10 @@ namespace realization {
          *
          * @return The inclusive beginning of the period of time over which this instance can provide this data.
          */
-        time_t get_forcing_output_time_begin(const std::string &forcing_name) {
+        //time_t get_forcing_output_time_begin(const std::string &forcing_name) {
+        time_t get_variable_time_begin(const std::string &variable_name) {
             // TODO: come back and implement if actually necessary for this type; for now don't use
-            throw runtime_error("Bmi_Modular_Formulation does not yet implement get_forcing_output_time_begin");
+            throw runtime_error("Bmi_Modular_Formulation does not yet implement get_variable_time_begin");
         }
 
         /**
@@ -297,10 +299,10 @@ namespace realization {
          *
          * @return The exclusive ending of the period of time over which this instance can provide this data.
          */
-        [[deprecated]]
-        time_t get_forcing_output_time_end(const std::string &output_name) {
+        //time_t get_forcing_output_time_end(const std::string &output_name) {
+        time_t get_variable_time_end(const std::string &varibale_name) {
             // TODO: come back and implement if actually necessary for this type; for now don't use
-            throw runtime_error("Bmi_Module_Formulation does not yet implement get_forcing_output_time_end");
+            throw runtime_error("Bmi_Module_Formulation does not yet implement get_variable_time_end");
         }
 
         long get_data_stop_time() override {
@@ -394,6 +396,7 @@ namespace realization {
 
             // First make sure this is an available output
             const std::vector<std::string> forcing_outputs = get_available_forcing_outputs();
+            //const std::vector<std::string> forcing_outputs = get_avaliable_variable_names();
             if (std::find(forcing_outputs.begin(), forcing_outputs.end(), output_name) == forcing_outputs.end()) {
                 throw runtime_error(get_formulation_type() + " received invalid output forcing name " + output_name);
             }
@@ -460,6 +463,7 @@ namespace realization {
 
             // First make sure this is an available output
             const std::vector<std::string> forcing_outputs = get_available_forcing_outputs();
+            //const std::vector<std::string> forcing_outputs = get_avaliable_variable_names();
             if (std::find(forcing_outputs.begin(), forcing_outputs.end(), output_name) == forcing_outputs.end()) {
                 throw runtime_error(get_formulation_type() + " received invalid output forcing name " + output_name);
             }

@@ -32,14 +32,14 @@ namespace forcing {
          *
          * @return The inclusive beginning of the period of time over which this instance can provide this data.
          */
-        virtual time_t get_forcing_output_time_begin(const std::string &output_name) = 0;
+        //virtual time_t get_forcing_output_time_begin(const std::string &output_name) = 0;
 
         /**
          * Get the exclusive ending of the period of time over which this instance can provide data for this forcing.
          *
          * @return The exclusive ending of the period of time over which this instance can provide this data.
          */
-        virtual time_t get_forcing_output_time_end(const std::string &output_name) = 0;
+        //virtual time_t get_forcing_output_time_end(const std::string &output_name) = 0;
 
         /**
          * Get the index of the forcing time step that contains the given point in time.
