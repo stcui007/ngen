@@ -285,8 +285,6 @@ namespace data_access
             // determine start_time and stop_time;
             start_time = time_vals[0];
             stop_time = time_vals.back() + time_stride;
-
-
         }
 
         NetCDFPerFeatureDataProvider(const char* input_path, utils::StreamHandler stream_h) : 

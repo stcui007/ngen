@@ -93,7 +93,6 @@ class Simulation_Time
     std::string get_timestamp(int current_output_time_index)
     {
         current_date_time_epoch = start_date_time_epoch + current_output_time_index * output_interval_seconds;
-            
         struct tm *temp_gmtime_struct;
 
         temp_gmtime_struct = gmtime(&current_date_time_epoch);
@@ -105,8 +104,18 @@ class Simulation_Time
             fprintf(stderr, "ERROR: strftime returned 0");
             exit(EXIT_FAILURE); 
         }
-
         return current_timestamp;
+    }
+
+    int get_current_data_time_epoch(int current_output_time_index)
+    {
+        current_date_time_epoch = start_date_time_epoch + current_output_time_index * output_interval_seconds;
+        return current_date_time_epoch;
+    }
+
+    int get_start_date_time_epoch()
+    {
+        return start_date_time_epoch;
     }
 
     private:

@@ -7,6 +7,10 @@
 #include <Catchment_Formulation.hpp>
 #include <HY_Features.hpp>
 
+#include "AorcForcing.hpp"
+#include <GenericDataProvider.hpp>
+#include "NetCDFPerFeatureDataProvider.hpp"
+
 #include "NGenConfig.h"
 #include "tshirt_params.h"
 
@@ -276,12 +280,35 @@ int main(int argc, char *argv[]) {
     std::cout<<"Running Models"<<std::endl;
 
     std::shared_ptr<pdm03_struct> pdm_et_data = std::make_shared<pdm03_struct>(get_et_params());
+    std::string input_path;
+    utils::StreamHandler log_s;
+
+  #ifdef NETCDF_ACTIVE
+    std::shared_ptr<data_access::GenericDataProvider> fp;
+    utils::StreamHandler output_stream;
+    //TODO next line is for temporary test only, need to be passed from somewhere else
+    std::string forcing_config_path = "./data/forcing/cats-27_52_67-2015_12_01-2015_12_30.nc";
+    fp = data_access::NetCDFPerFeatureDataProvider::get_shared_provider(forcing_config_path, output_stream);
+    int delta_time = manager->Simulation_Time_Object->get_output_interval_seconds();
+
+    int start_date_time_epoch = manager->Simulation_Time_Object->get_start_date_time_epoch();
+    int time_offset_index = (int) ((start_date_time_epoch - fp->get_data_start_time()) / delta_time);
+  #endif
 
     //Now loop some time, iterate catchments, do stuff for total number of output times
     for(int output_time_index = 0; output_time_index < manager->Simulation_Time_Object->get_total_output_times(); output_time_index++) {
-      //std::cout<<"Output Time Index: "<<output_time_index<<std::endl;
+  #ifdef NETCDF_ACTIVE
+      if (output_time_index < time_offset_index) {
+        continue;
+      }
       if(output_time_index%100 == 0) std::cout<<"Running timestep "<<output_time_index<<std::endl;
-      std::string current_timestamp = manager->Simulation_Time_Object->get_timestamp(output_time_index);
+      std::string current_timestamp = manager->Simulation_Time_Object->get_timestamp(output_time_index-time_offset_index);
+      int current_date_time_epoch = manager->Simulation_Time_Object->get_current_data_time_epoch(output_time_index);
+      int start_date_time_epoch = manager->Simulation_Time_Object->get_start_date_time_epoch();
+  #endif
+
+      //if (current_date_time_epoch >= start_date_time_epoch) {
+      //  std::string current_timestamp = manager->Simulation_Time_Object->get_timestamp(output_time_index);
       for(const auto& id : features.catchments()) {
         //std::cout<<"Running cat "<<id<<std::endl;
         auto r = features.catchment_at(id);
@@ -289,7 +316,9 @@ int main(int argc, char *argv[]) {
         auto r_c = dynamic_pointer_cast<realization::Catchment_Formulation>(r);
         r_c->set_et_params(pdm_et_data);
         double response = r_c->get_response(output_time_index, 3600.0);
-        std::string output = std::to_string(output_time_index)+","+current_timestamp+","+
+        int time_index_w_offset = output_time_index-time_offset_index;
+        //std::string output = std::to_string(output_time_index-time_offset_index)+","+current_timestamp+","+
+        std::string output = std::to_string(time_index_w_offset)+","+current_timestamp+","+
                              r_c->get_output_line_for_timestep(output_time_index)+"\n";
         r_c->write_output(output);
         //TODO put this somewhere else.  For now, just trying to ensure we get m^3/s into nexus output
@@ -345,6 +374,7 @@ int main(int argc, char *argv[]) {
         //If using below, then another single time vector would be needed to hold the timestamp
         //nexus_flows[id].push_back(contribution_at_t); 
       } //done nexuses
+     //} // done if block
     } //done time
     std::cout<<"Finished "<<manager->Simulation_Time_Object->get_total_output_times()<<" timesteps."<<std::endl;
 
