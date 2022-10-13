@@ -286,12 +286,28 @@ int main(int argc, char *argv[]) {
   #ifdef NETCDF_ACTIVE
     std::shared_ptr<data_access::GenericDataProvider> fp;
     utils::StreamHandler output_stream;
-    //TODO next line is for temporary test only, need to be passed from somewhere else
-    std::string forcing_config_path = "./data/forcing/cats-27_52_67-2015_12_01-2015_12_30.nc";
-    fp = data_access::NetCDFPerFeatureDataProvider::get_shared_provider(forcing_config_path, output_stream);
     int delta_time = manager->Simulation_Time_Object->get_output_interval_seconds();
 
     int start_date_time_epoch = manager->Simulation_Time_Object->get_start_date_time_epoch();
+    int end_date_time_epoch = manager->Simulation_Time_Object->get_start_date_time_epoch();
+    //initialize the struct
+    simulation_time_params simulation_time_config = {
+      std::to_string(start_date_time_epoch),
+      std::to_string(end_date_time_epoch),
+      delta_time
+    };
+
+    //find the netcdf forcing path
+    std::string forcing_config_path;
+    for(const auto& id : features.catchments()) {
+      //only need one gloabal forcing file, no need to loop through all ids
+      if (id != "") {
+        forcing_params netcdf_forcing_file = manager->get_global_forcing(id, simulation_time_config);
+        forcing_config_path = netcdf_forcing_file.path;
+        break;
+      }
+    }
+    fp = data_access::NetCDFPerFeatureDataProvider::get_shared_provider(forcing_config_path, output_stream);
     int time_offset_index = (int) ((start_date_time_epoch - fp->get_data_start_time()) / delta_time);
   #endif
 
@@ -307,8 +323,6 @@ int main(int argc, char *argv[]) {
       int start_date_time_epoch = manager->Simulation_Time_Object->get_start_date_time_epoch();
   #endif
 
-      //if (current_date_time_epoch >= start_date_time_epoch) {
-      //  std::string current_timestamp = manager->Simulation_Time_Object->get_timestamp(output_time_index);
       for(const auto& id : features.catchments()) {
         //std::cout<<"Running cat "<<id<<std::endl;
         auto r = features.catchment_at(id);
@@ -316,10 +330,17 @@ int main(int argc, char *argv[]) {
         auto r_c = dynamic_pointer_cast<realization::Catchment_Formulation>(r);
         r_c->set_et_params(pdm_et_data);
         double response = r_c->get_response(output_time_index, 3600.0);
+    #ifdef NETCDF_ACTIVE
         int time_index_w_offset = output_time_index-time_offset_index;
         //std::string output = std::to_string(output_time_index-time_offset_index)+","+current_timestamp+","+
         std::string output = std::to_string(time_index_w_offset)+","+current_timestamp+","+
                              r_c->get_output_line_for_timestep(output_time_index)+"\n";
+    #else
+        std::string current_timestamp = manager->Simulation_Time_Object->get_timestamp(output_time_index);
+        std::string output = std::to_string(output_time_index )+","+current_timestamp+","+
+                             r_c->get_output_line_for_timestep(output_time_index)+"\n";
+
+    #endif
         r_c->write_output(output);
         //TODO put this somewhere else.  For now, just trying to ensure we get m^3/s into nexus output
         try{

@@ -245,6 +245,21 @@ namespace realization {
                     return "";
             }
 
+            forcing_params get_global_forcing(std::string identifier, simulation_time_params &simulation_time_config) {
+                std::string path = this->global_forcing.at("path").as_string();
+                std::string provider = "";
+                if(this->global_forcing.count("provider") != 0){
+                    provider = global_forcing.at("provider").as_string();
+                }
+                if (this->global_forcing.count("file_pattern") == 0) {
+                    return forcing_params(
+                        path,
+                        provider,
+                        simulation_time_config.start_time,
+                        simulation_time_config.end_time
+                    );
+                }
+            }
 
         protected:
             std::shared_ptr<Catchment_Formulation> construct_formulation_from_tree(
