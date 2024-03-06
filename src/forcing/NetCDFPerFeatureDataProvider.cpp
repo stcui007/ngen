@@ -37,19 +37,23 @@ NetCDFPerFeatureDataProvider::NetCDFPerFeatureDataProvider(std::string input_pat
     //nc_set_chunk_cache(sizep, nelemsp, preemptionp);
 
     //open the file
-    nc_file = std::make_shared<netCDF::NcFile>(input_path, netCDF::NcFile::read);
+    //nc_file = std::make_shared<netCDF::NcFile>(input_path, netCDF::NcFile::read);
+    std::shared_ptr<netCDF::NcFile> sp = std::make_shared<netCDF::NcFile>(input_path, netCDF::NcFile::read);
+    nc_file = sp;
     
     //nc_get_chunk_cache(&sizep, &nelemsp, &preemptionp);
     //std::cout << "Chunk cache parameters: "<<sizep<<", "<<nelemsp<<", "<<preemptionp<<std::endl;
 
     //get the listing of all variables
-    auto var_set = nc_file->getVars();
+    //auto var_set = nc_file->getVars();
+    auto var_set = nc_file.lock()->getVars();
 
     // populate the ncvar and units caches...
     std::for_each(var_set.begin(), var_set.end(), [&](const auto& element)
     {
         std::string var_name = element.first;
-        auto ncvar = nc_file->getVar(var_name);
+        //auto ncvar = nc_file->getVar(var_name);
+        auto ncvar = nc_file.lock()->getVar(var_name);
         variable_names.push_back(var_name);
         ncvar_cache.emplace(var_name,ncvar);
 
@@ -84,7 +88,7 @@ NetCDFPerFeatureDataProvider::NetCDFPerFeatureDataProvider(std::string input_pat
     });
 
     // read the variable ids
-    auto ids = nc_file->getVar("ids"); 
+    auto ids = nc_file.lock()->getVar("ids"); 
     auto id_dim_count = ids.getDimCount();
 
     // some sanity checks
@@ -123,13 +127,13 @@ NetCDFPerFeatureDataProvider::NetCDFPerFeatureDataProvider(std::string input_pat
     nc_free_string(num_ids,&string_buffers[0]);
 
     // now get the size of the time dimension
-    auto num_times = nc_file->getDim("time").getSize();
+    auto num_times = nc_file.lock()->getDim("time").getSize();
 
     // allocate storage for the raw time array
     std::vector<double> raw_time(num_times);
 
     // get the time variable
-    auto time_var = nc_file->getVar("Time");
+    auto time_var = nc_file.lock()->getVar("Time");
 
     // read from the first catchment row to get the recorded times
     std::vector<size_t> start;
@@ -260,7 +264,10 @@ NetCDFPerFeatureDataProvider::NetCDFPerFeatureDataProvider(std::string input_pat
     sim_to_data_time_offset = sim_start_date_time_epoch - start_time;
 }
 
-NetCDFPerFeatureDataProvider::~NetCDFPerFeatureDataProvider() = default;
+//NetCDFPerFeatureDataProvider::~NetCDFPerFeatureDataProvider() = default;
+NetCDFPerFeatureDataProvider::~NetCDFPerFeatureDataProvider() {
+    nc_file.lock()->close();
+}
 
 boost::span<const std::string> NetCDFPerFeatureDataProvider::get_available_variable_names()
 {
@@ -430,6 +437,11 @@ std::vector<double> NetCDFPerFeatureDataProvider::get_values(const CatchmentAggr
 {
     return std::vector<double>(1, get_value(selector, m));
 }
+
+//std::shared_ptr<netCDF::NcFile> NetCDFPerFeatureDataProvider::get_nc_file()
+//{
+//    return nc_file;
+//}
 
 // private:
 

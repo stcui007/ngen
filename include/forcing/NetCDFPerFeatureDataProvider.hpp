@@ -125,7 +125,8 @@ namespace data_access
         utils::StreamHandler log_stream;
 
 
-        std::shared_ptr<netCDF::NcFile> nc_file;
+        //std::shared_ptr<netCDF::NcFile> nc_file;
+        std::weak_ptr<netCDF::NcFile> nc_file;
 
         std::map<std::string,netCDF::NcVar> ncvar_cache;
         std::map<std::string,std::string> units_cache;
