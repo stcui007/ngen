@@ -4,7 +4,7 @@
 #include <netcdf>
 
 std::mutex data_access::NetCDFPerFeatureDataProvider::shared_providers_mutex;
-std::map<std::string, std::shared_ptr<data_access::NetCDFPerFeatureDataProvider>> data_access::NetCDFPerFeatureDataProvider::shared_providers;
+std::map<std::string, std::weak_ptr<data_access::NetCDFPerFeatureDataProvider>> data_access::NetCDFPerFeatureDataProvider::shared_providers;
 
 namespace data_access {
 
@@ -12,13 +12,19 @@ std::shared_ptr<NetCDFPerFeatureDataProvider> NetCDFPerFeatureDataProvider::get_
 {
     const std::lock_guard<std::mutex> lock(shared_providers_mutex);
     std::shared_ptr<NetCDFPerFeatureDataProvider> p;
+    std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
     if(shared_providers.count(input_path) > 0){
-        p = shared_providers[input_path];
+        //p = shared_providers[input_path];
+        //std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
+        p_weak = shared_providers[input_path];
     } else {
         p = std::make_shared<data_access::NetCDFPerFeatureDataProvider>(input_path, sim_start, sim_end, log_s);
-        shared_providers[input_path] = p;
+        std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
+        shared_providers[input_path] = p_weak;
+        //shared_providers[input_path] = p;
+        //std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
     }
-    return p;
+    return p_weak;
 }
 
 void NetCDFPerFeatureDataProvider::cleanup_shared_providers()
@@ -38,22 +44,23 @@ NetCDFPerFeatureDataProvider::NetCDFPerFeatureDataProvider(std::string input_pat
 
     //open the file
     //nc_file = std::make_shared<netCDF::NcFile>(input_path, netCDF::NcFile::read);
-    std::shared_ptr<netCDF::NcFile> sp = std::make_shared<netCDF::NcFile>(input_path, netCDF::NcFile::read);
-    nc_file = sp;
+    //std::shared_ptr<netCDF::NcFile> sp = std::make_shared<netCDF::NcFile>(input_path, netCDF::NcFile::read);
+    //nc_file = sp;
+    nc_file = std::make_unique<netCDF::NcFile>(input_path, netCDF::NcFile::read);
     
     //nc_get_chunk_cache(&sizep, &nelemsp, &preemptionp);
     //std::cout << "Chunk cache parameters: "<<sizep<<", "<<nelemsp<<", "<<preemptionp<<std::endl;
 
     //get the listing of all variables
-    //auto var_set = nc_file->getVars();
-    auto var_set = nc_file.lock()->getVars();
+    auto var_set = nc_file->getVars();
+    //auto var_set = nc_file.lock()->getVars();
 
     // populate the ncvar and units caches...
     std::for_each(var_set.begin(), var_set.end(), [&](const auto& element)
     {
         std::string var_name = element.first;
-        //auto ncvar = nc_file->getVar(var_name);
-        auto ncvar = nc_file.lock()->getVar(var_name);
+        auto ncvar = nc_file->getVar(var_name);
+        //auto ncvar = nc_file.lock()->getVar(var_name);
         variable_names.push_back(var_name);
         ncvar_cache.emplace(var_name,ncvar);
 
@@ -88,7 +95,7 @@ NetCDFPerFeatureDataProvider::NetCDFPerFeatureDataProvider(std::string input_pat
     });
 
     // read the variable ids
-    auto ids = nc_file.lock()->getVar("ids"); 
+    auto ids = nc_file->getVar("ids"); 
     auto id_dim_count = ids.getDimCount();
 
     // some sanity checks
@@ -127,13 +134,13 @@ NetCDFPerFeatureDataProvider::NetCDFPerFeatureDataProvider(std::string input_pat
     nc_free_string(num_ids,&string_buffers[0]);
 
     // now get the size of the time dimension
-    auto num_times = nc_file.lock()->getDim("time").getSize();
+    auto num_times = nc_file->getDim("time").getSize();
 
     // allocate storage for the raw time array
     std::vector<double> raw_time(num_times);
 
     // get the time variable
-    auto time_var = nc_file.lock()->getVar("Time");
+    auto time_var = nc_file->getVar("Time");
 
     // read from the first catchment row to get the recorded times
     std::vector<size_t> start;
@@ -266,7 +273,7 @@ NetCDFPerFeatureDataProvider::NetCDFPerFeatureDataProvider(std::string input_pat
 
 //NetCDFPerFeatureDataProvider::~NetCDFPerFeatureDataProvider() = default;
 NetCDFPerFeatureDataProvider::~NetCDFPerFeatureDataProvider() {
-    nc_file.lock()->close();
+    nc_file->close();
 }
 
 boost::span<const std::string> NetCDFPerFeatureDataProvider::get_available_variable_names()

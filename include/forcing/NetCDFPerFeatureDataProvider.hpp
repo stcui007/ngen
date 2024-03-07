@@ -112,7 +112,8 @@ namespace data_access
         time_t sim_to_data_time_offset; // Deliberately signed--sim should never start before data, yes?
 
         static std::mutex shared_providers_mutex;
-        static std::map<std::string, std::shared_ptr<NetCDFPerFeatureDataProvider>> shared_providers;
+        //static std::map<std::string, std::shared_ptr<NetCDFPerFeatureDataProvider>> shared_providers;
+        static std::map<std::string, std::weak_ptr<NetCDFPerFeatureDataProvider>> shared_providers;
 
         std::vector<std::string> variable_names;
         std::vector<std::string> loc_ids;
@@ -126,7 +127,7 @@ namespace data_access
 
 
         //std::shared_ptr<netCDF::NcFile> nc_file;
-        std::weak_ptr<netCDF::NcFile> nc_file;
+        std::unique_ptr<netCDF::NcFile> nc_file;
 
         std::map<std::string,netCDF::NcVar> ncvar_cache;
         std::map<std::string,std::string> units_cache;

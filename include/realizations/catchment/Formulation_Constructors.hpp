@@ -62,7 +62,8 @@ namespace realization {
         }
 #ifdef NETCDF_ACTIVE
         else if (forcing_config.provider == "NetCDF"){
-            fp = data_access::NetCDFPerFeatureDataProvider::get_shared_provider(forcing_config.path, forcing_config.simulation_start_t, forcing_config.simulation_end_t, output_stream);
+            fp_shr = data_access::NetCDFPerFeatureDataProvider::get_shared_provider(forcing_config.path, forcing_config.simulation_start_t, forcing_config.simulation_end_t, output_stream);
+            static std::weak_ptr<NetCDFPerFeatureDataProvider> fp = fp_shr;
         }
 #endif
         else if (forcing_config.provider == "NullForcingProvider"){
