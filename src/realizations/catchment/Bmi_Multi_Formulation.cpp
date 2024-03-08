@@ -15,8 +15,11 @@ void Bmi_Multi_Formulation::create_multi_formulation(geojson::PropertyMap proper
     set_bmi_main_output_var(properties.at(BMI_REALIZATION_CFG_PARAM_REQ__MAIN_OUT_VAR).as_string());
     set_model_type_name(properties.at(BMI_REALIZATION_CFG_PARAM_REQ__MODEL_TYPE).as_string());
 
-    std::shared_ptr<data_access::WrappedDataProvider> forcing_provider = std::make_shared<data_access::WrappedDataProvider>(forcing.get());
-    for (const std::string &forcing_name_or_alias : forcing->get_available_variable_names()) {
+    //std::shared_ptr<data_access::GenericDataProvider> forcing_ptr = nullptr;
+    std::shared_ptr<data_access::GenericDataProvider> forcing_ptr;
+    if (!forcing.expired()) forcing_ptr = forcing.lock();
+    std::shared_ptr<data_access::WrappedDataProvider> forcing_provider = std::make_shared<data_access::WrappedDataProvider>(forcing_ptr.get());
+    for (const std::string &forcing_name_or_alias : forcing_ptr->get_available_variable_names()) {
         availableData[forcing_name_or_alias] = forcing_provider;
     }
 

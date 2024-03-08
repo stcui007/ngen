@@ -113,7 +113,7 @@ namespace data_access
 
         static std::mutex shared_providers_mutex;
         //static std::map<std::string, std::shared_ptr<NetCDFPerFeatureDataProvider>> shared_providers;
-        static std::map<std::string, std::weak_ptr<NetCDFPerFeatureDataProvider>> shared_providers;
+        static std::map<std::string, std::shared_ptr<NetCDFPerFeatureDataProvider>> shared_providers;
 
         std::vector<std::string> variable_names;
         std::vector<std::string> loc_ids;

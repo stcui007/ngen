@@ -68,7 +68,9 @@ protected:
     }
 
     static time_t get_friend_forcing_start_time(Bmi_Py_Formulation& formulation) {
-        return formulation.forcing->get_data_start_time();
+        std::shared_ptr<data_access::GenericDataProvider> forcing_ptr = nullptr;
+        if (!formulation.forcing.expired()) forcing_ptr = formulation.forcing.lock();
+        return forcing_ptr->get_data_start_time();
     }
 
     static bool get_friend_is_bmi_using_forcing_file(const Bmi_Py_Formulation& formulation) {

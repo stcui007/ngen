@@ -60,7 +60,9 @@ protected:
     }
 
     static time_t get_friend_forcing_start_time(Bmi_Cpp_Formulation& formulation) {
-        return formulation.forcing->get_data_start_time();
+        std::shared_ptr<data_access::GenericDataProvider> forcing_ptr = nullptr;
+        if (!formulation.forcing.expired()) forcing_ptr = formulation.forcing.lock();
+        return forcing_ptr->get_data_start_time();
     }
 
     static bool get_friend_is_bmi_using_forcing_file(const Bmi_Cpp_Formulation& formulation) {
@@ -226,8 +228,11 @@ void Bmi_Cpp_Formulation_Test::TearDown() {
 TEST_F(Bmi_Cpp_Formulation_Test, Initialize_0_a) {
     int ex_index = 0;
 
+    std::cout << "Before formulation" << std::endl;
     Bmi_Cpp_Formulation formulation(catchment_ids[ex_index], std::make_unique<CsvPerFeatureForcingProvider>(*forcing_params_examples[ex_index]), utils::StreamHandler());
+    std::cout << "After formulation" << std::endl;
     formulation.create_formulation(config_prop_ptree[ex_index]);
+    std::cout << "After create_formulation" << std::endl;
 
     ASSERT_EQ(get_friend_model_type_name(formulation), model_type_name[ex_index]);
     ASSERT_EQ(get_friend_forcing_file_path(formulation), forcing_file[ex_index]);

@@ -585,6 +585,9 @@ int main(int argc, char *argv[]) {
 #endif
                   << std::endl;
     }
+#ifdef NETCDF_ACTIVE
+    data_access::NetCDFPerFeatureDataProvider::cleanup_shared_providers();
+#endif
 
 #ifdef NGEN_MPI_ACTIVE
     MPI_Finalize();

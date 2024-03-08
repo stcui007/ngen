@@ -418,9 +418,12 @@ namespace realization {
          * this value.
          */
         void determine_model_time_offset() {
-            set_bmi_model_start_time_forcing_offset_s(
-                    // TODO: Look at making this epoch start configurable instead of from forcing
-                    forcing->get_data_start_time() - convert_model_time(get_bmi_model()->GetStartTime()));
+           //std::shared_ptr<data_access::GenericDataProvider> forcing_ptr = nullptr;
+           std::shared_ptr<data_access::GenericDataProvider> forcing_ptr;
+           if (!forcing.expired()) forcing_ptr = forcing.lock();
+               set_bmi_model_start_time_forcing_offset_s(
+               // TODO: Look at making this epoch start configurable instead of from forcing
+               forcing_ptr->get_data_start_time() - convert_model_time(get_bmi_model()->GetStartTime()));
         }
 
         /**
@@ -863,6 +866,8 @@ namespace realization {
             std::vector<std::string> in_var_names = get_bmi_model()->GetInputVarNames();
             time_t model_epoch_time = convert_model_time(model_init_time) + get_bmi_model_start_time_forcing_offset_s();
 
+            //std::shared_ptr<data_access::GenericDataProvider> forcing_ptr = nullptr;
+            std::shared_ptr<data_access::GenericDataProvider> forcing_ptr;
             for (std::string & var_name : in_var_names) {
                 data_access::GenericDataProvider *provider;
                 std::string var_map_alias = get_config_mapped_variable_name(var_name);
@@ -872,8 +877,9 @@ namespace realization {
                 else if (var_map_alias != var_name && input_forcing_providers.find(var_name) != input_forcing_providers.end()) {
                     provider = input_forcing_providers[var_name].get();
                 }
-                else {
-                    provider = forcing.get();
+                else if (!forcing.expired()) {
+                    forcing_ptr = forcing.lock();
+                    provider = forcing_ptr.get();
                 }
 
                 // TODO: probably need to actually allow this by default and warn, but have config option to activate

@@ -51,7 +51,8 @@ class HY_CatchmentRealization
     unsigned long id_number;
 
   protected:
-    std::shared_ptr<data_access::GenericDataProvider> forcing;
+    //std::shared_ptr<data_access::GenericDataProvider> forcing;
+    std::weak_ptr<data_access::GenericDataProvider> forcing;
 
   private:
 

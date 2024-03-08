@@ -60,7 +60,10 @@ protected:
     }
 
     static time_t get_friend_forcing_start_time(Bmi_Fortran_Formulation& formulation) {
-        return formulation.forcing->get_data_start_time();
+        std::shared_ptr<data_access::GenericDataProvider> forcing_ptr = nullptr;
+        if (!formulation.forcing.expired()) forcing_ptr = formulation.forcing.lock();
+        //return formulation.forcing_ptr->get_data_start_time();
+        return forcing_ptr->get_data_start_time();
     }
 
     static bool get_friend_is_bmi_using_forcing_file(const Bmi_Fortran_Formulation& formulation) {

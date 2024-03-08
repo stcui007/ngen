@@ -239,8 +239,11 @@ namespace realization {
             std::string var_name = variable_name;
             // when unspecified, assume all data is available for the same range.
             // If no var_name, use forcing ...
+            //std::shared_ptr<data_access::GenericDataProvider> forcing_ptr = nullptr;
+            std::shared_ptr<data_access::GenericDataProvider> forcing_ptr;
+            if (!forcing.expired()) forcing_ptr = forcing.lock();
             if(var_name == "*" || var_name == ""){
-                return forcing->get_data_start_time();
+                return forcing_ptr->get_data_start_time();
             }
             // If not found ...
             if (availableData.empty() || availableData.find(var_name) == availableData.end()) {
@@ -278,8 +281,11 @@ namespace realization {
             // when unspecified, assume all data is available for the same range.
             // If no var_name, use forcing ...
             std::string var_name = variable_name;
+            //std::shared_ptr<data_access::GenericDataProvider> forcing_ptr = nullptr;
+            std::shared_ptr<data_access::GenericDataProvider> forcing_ptr;
+            if (!forcing.expired()) forcing_ptr = forcing.lock();
             if(var_name == "*" || var_name == ""){
-                return forcing->get_data_stop_time();
+                return forcing_ptr->get_data_stop_time();
             }
             // If not found ...
             if (availableData.empty() || availableData.find(var_name) == availableData.end()) {

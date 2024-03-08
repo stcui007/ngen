@@ -4,7 +4,7 @@
 #include <netcdf>
 
 std::mutex data_access::NetCDFPerFeatureDataProvider::shared_providers_mutex;
-std::map<std::string, std::weak_ptr<data_access::NetCDFPerFeatureDataProvider>> data_access::NetCDFPerFeatureDataProvider::shared_providers;
+std::map<std::string, std::shared_ptr<data_access::NetCDFPerFeatureDataProvider>> data_access::NetCDFPerFeatureDataProvider::shared_providers;
 
 namespace data_access {
 
@@ -12,19 +12,18 @@ std::shared_ptr<NetCDFPerFeatureDataProvider> NetCDFPerFeatureDataProvider::get_
 {
     const std::lock_guard<std::mutex> lock(shared_providers_mutex);
     std::shared_ptr<NetCDFPerFeatureDataProvider> p;
-    std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
     if(shared_providers.count(input_path) > 0){
-        //p = shared_providers[input_path];
+        p = shared_providers[input_path];
         //std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
-        p_weak = shared_providers[input_path];
+        //p_weak = shared_providers[input_path];
     } else {
         p = std::make_shared<data_access::NetCDFPerFeatureDataProvider>(input_path, sim_start, sim_end, log_s);
-        std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
-        shared_providers[input_path] = p_weak;
-        //shared_providers[input_path] = p;
+        //std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
+        //shared_providers[input_path] = p_weak;
+        shared_providers[input_path] = p;
         //std::weak_ptr<NetCDFPerFeatureDataProvider> p_weak = p;
     }
-    return p_weak;
+    return p;
 }
 
 void NetCDFPerFeatureDataProvider::cleanup_shared_providers()
