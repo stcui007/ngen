@@ -13,6 +13,7 @@ This documentation provides instructions on all neccessary steps and components 
 * [Run Computations with submodules](#run-computations-with-submodules)
 * [Resource Usage](#resource-usage)
 * [Run Computation with Topmodel](#run-computation-with-topmodel)
+* [Run Computation with Lasam Model](#run-computation-with-lasam-model)
 * [Run Computation with Routing](#run-computation-with-routing)
 
 # Summary
@@ -166,7 +167,7 @@ Be aware that the above commands will generate over a million output files assoc
 
 # Resource Usage
 
-The following table lists the CPU wall clock ime used for various realization configurations running 10 day simulation time. The timing values reported in the table are from single run, not from average. Note in particular that the `Initialization Time` may be significantly affected by system loads at the time of job start.
+The following table lists the CPU wall clock time used for various realization configurations running 10 day simulation time. The timing values reported in the table are from single run, not from average. Note in particular that the `Initialization Time` may be significantly affected by system loads at the time of job start.
 
 | Realization | Number of CPUs | Initialization Time (s) | Computation Time (s) | Total Time (s) |
 | ------------- | :-----: | :--------: | :--------: | :--------: |
@@ -178,7 +179,7 @@ The following table lists the CPU wall clock ime used for various realization co
 | conus_bmi_multi_realization_config_w_sloth_noah_pet_smp_sft.json | 32 | 3245.7 | 3808.1 | 7053.8 |
 | conus_bmi_multi_realization_config_w_sloth_noah_pet_smp_sft_cfe.json | 32 | 1354.7 | 5283.1 | 6637.8 |
 
-The abreviation used for submodule names in the table:
+The abbreviation used for submodule names in the table:
 * noah - noah-owp-modular
 * pet - potential evapotranspiration
 * cfe - Conceptual functional equivalence
@@ -187,7 +188,66 @@ The abreviation used for submodule names in the table:
 
 # Run Computation with Topmodel
 
-To be added
+Running Topmodel is similar to running CFE model. The build process is the same as described above in the [Build the Executable](#build-the-executable) using the same build script. In the realization configuration file, you will just need to replace the part for CFE submodule with the one for Topmodel submodule. Note that Topmodel uses different initial configuration data and parameters that need to be generated. For this we refer the users to githup home page for [Topmodel](https://github.com/NOAA-OWP/topmodel) more in depth discussion. In the following, we provide two examples for illustration. Note that in the examples we tested with the realization configuration files that used the so called `synthetic TWI (Topographic Wetness Index)`, i.e., the same initial configuration files for all catchments to make the computation simple. Also, for Topmodel, some of the realization configurations do not need `sloth` submodule for initialization.
+
+For a relatively simple example involving just two submodules, you can run the following command:
+
+```
+mpirun -n 32 ./cmake_build_mpi/ngen ./hydrofabric/conus.gpkg '' ./hydrofabric/conus.gpkg '' data/baseline/conus_bmi_multi_realization_config_w_noah_topm.json conus_partition_32.json
+```
+
+For a more complex example, you can run:
+
+```
+mpirun -n 32 ./cmake_build_mpi/ngen ./hydrofabric/conus.gpkg '' ./hydrofabric/conus.gpkg '' data/baseline/conus_bmi_multi_realization_config_w_sloth_noah_pet_smp_sft_topm.json conus_partition_32.json
+```
+
+The outputs are specified in the `topmod_cat-id.run` file for each `cat-id`.
+
+The wall clock timing in our tests for various realization configurations running 10 days simulation are tabulated as follows. Note that the timing values are from a single run, no averaging was attempted.
+
+| Realization | Number of CPUs | Initialization Time (s) | Computation Time (s) | Total Time (s) |
+| ------------- | :-----: | :--------: | :--------: | :--------: |
+| conus_bmi_multi_realization_config_w_noah_topm.json | 32 | 3211.9 | 4175.2 | 7387.1 |
+| conus_bmi_multi_realization_config_w_pet_topm.json | 32 | 3427.3  | 4658.9 | 8086.2  |
+| conus_bmi_multi_realization_config_w_noah_pet_topm.json | 32 | 4019.4 | 6565.8 | 10585.2 |
+| conus_bmi_multi_realization_config_w_pet_noah_topm.json | 32 | 4053.8 | 5449.9 | 9503.7 |
+| conus_bmi_multi_realization_config_w_sloth_noah_pet_smp_sft_topm.json | 32 | 7329.4 | 7308.6 | 14638.0 |
+
+* topm - abbreviation for Topmodel
+* For all other abbreviations, see [Resource Usage](#resource-usage)
+
+# Run Computation with Lasam Model
+
+Running Lasam model is similar to running CFE and Topmodel model. The build process is the same as described above in the [Build the Executable](#build-the-executable) using the same build script. In the realization configuration file, you will need to replace the part for CFE or Topmodel submodule with the one for Lasam submodule. For the initial configuration and parameters, for the computation results reported here, we have used the same one for all catchments on CONUS for testing purpose. The initial configuration is a work in progress and when the more realstic initial configuration becomes available, we will repeat the calculations and update the results. 
+
+To run one of the example realization configs, you can execute the following command:
+
+```
+mpirun -n 32 ./cmake_build_mpi/ngen ./hydrofabric/conus.gpkg '' ./hydrofabric/conus.gpkg '' data/baseline/conus_bmi_multi_realization_config_w_sloth_noah_pet_lgc.json conus_partition_32.json
+```
+
+To run a realization config with `Routing`, you can execute the following command:
+
+```
+mpirun -n 32 ./cmake_build_mpi/ngen ./hydrofabric/conus.gpkg '' ./hydrofabric/conus.gpkg '' data/baseline/conus_bmi_multi_realization_config_w_sloth_noah_pet_lgc_trt.json conus_partition_32.json
+```
+
+The wall clock timing in our tests for various realization configurations running 10 days simulation are tabulated as follows. Note that the timing values are from a single run, on different machines with similar architecture, but no averaging was attempted. Note also that frequent `print` statement to the standard output in submodules/model codes can significantly increase the `Computation Time`.
+
+| Realization | Number of CPUs | Initialization Time (s) | Computation Time (s) | Total Time (s) |
+| ------------- | :-----: | :--------: | :--------: | :--------: |
+| conus_bmi_multi_realization_config_w_sloth_lgc.json | 32 | 728.7 | 5670.2 | 6398.9 |
+| conus_bmi_multi_realization_config_w_sloth_noah_lgc.json | 32 | 1160.9 | 10055.6 | 11216.5 |
+| conus_bmi_multi_realization_config_w_sloth_pet_lgc.json | 32 | 1060.8 | 6018.8 | 7079.6 |
+| conus_bmi_multi_realization_config_w_sloth_noah_pet_lgc.json | 32 | 3198.3 | 16129.1 | 19327.4 |
+| conus_bmi_multi_realization_config_w_sloth_noah_pet_smp_lgc.json | 32 | 1209.0 | 7461.5 | 8670.5 |
+| conus_bmi_multi_realization_config_w_sloth_noah_pet_smp_sft_lgc.json | 32 | 1092.1 | 9163.8 | 10255.9 |
+| conus_bmi_multi_realization_config_w_sloth_noah_pet_lgc_trt.json | 32 | 8452.8 | 10284.4 | 18737.2 |
+| conus_bmi_multi_realization_config_w_sloth_noah_pet_smp_sft_lgc_trt.json | 32 | 7139.5 | 8416.9 | 15556.4 |
+
+* lgc - abbreviation for LGAR-C
+* For all other abbreviations, see [Resource Usage](#resource-usage)
 
 # Run Computation with Routing
 
@@ -241,4 +301,4 @@ In the following table, we display the CPU timing information for a few realizat
 | conus_bmi_multi_realization_config_w_sloth_noah_pet_smp_sft_cfe_trt.json | 32 | 2142.0 | 5632.4 | 4510.3 | 12284.7 |
 
 * trt - abbreviation for t-route
-* For all other abbreviations, see [Resource Usage](#resource-usage).
+* For all other abbreviations, see [Resource Usage](#resource-usage)
